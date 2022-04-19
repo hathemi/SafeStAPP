@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers, validators
+from django.contrib.auth.hashers import make_password
 
 CustomUser = get_user_model()
 
@@ -33,21 +34,11 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = (
-            "id",
-            "nom",
-            "prenom",
-            "email",
-            "password",
-            "tel",
-            "pays_code",
-            "gender",
-            "tel_verified",
-            "conservatrice",
-            "alcoolique",
-            "accepte_animal",
-            "autre_details",
-        )
+        fields = "__all__"
+
+    def validate_password(self, value: str) -> str:
+
+        return make_password(value)
 
 
 class CustomUserRetrieveSerializer(serializers.ModelSerializer):
@@ -62,15 +53,16 @@ class CustomUserRetrieveSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = (
-            "nom",
-            "prenom",
-            "email",
-            "tel",
-            "gender",
-            "conservatrice",
-            "alcoolique",
-            "accepte_animal",
-            "autre_details",
-            "id",
-        )
+        fields = "__all__"
+        # (
+        #     "nom",
+        #     "prenom",
+        #     "email",
+        #     "tel",
+        #     "gender",
+        #     "conservatrice",
+        #     "alcoolique",
+        #     "accepte_animal",
+        #     "autre_details",
+        #     "id",
+        # )

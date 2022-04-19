@@ -15,6 +15,9 @@ django-extensions = "*"
 shortuuid = "*"
 pillow = "*"
 validate-email = "*"
+psycopg2-binary = "*"
+django-base64field = "*"
+psycopg2 = "*"
 
 [dev-packages]
 

@@ -1,24 +1,28 @@
 from django.urls import include, path
 
 from reservation.views import (
-    ChambreRetrieveUpdateView,
-    ChambreListCreateAPIView,
+    AppartementRetrieveUpdateView,
+    AppartementListCreateAPIView,
     ServiceRetrieveUpdateView,
     ServiceListCreateAPIView,
     UniversiteRetrieveUpdateView,
     UniversiteListCreateAPIView,
+    ProprieteListCreateAPIView,
+    ProprieteRetrieveUpdateView,
+    DemandeReservationDortoireListCreateAPIView,
+    DemandeReservationDortoireRetrieveUpdateView,
 )
 
 urlpatterns = [
     path(
-        "chambres/",
-        ChambreListCreateAPIView.as_view(),
-        name="chambres",
+        "appartements/",
+        AppartementListCreateAPIView.as_view(),
+        name="appartements",
     ),
     path(
-        "chambres/<int:pk>/",
-        ChambreRetrieveUpdateView.as_view(),
-        name="chambre_info",
+        "appartements/<int:pk>/",
+        AppartementRetrieveUpdateView.as_view(),
+        name="appartement_info",
     ),
     path(
         "services/",
@@ -39,5 +43,25 @@ urlpatterns = [
         "universites/<int:pk>/",
         UniversiteRetrieveUpdateView.as_view(),
         name="universite_info",
+    ),
+    path(
+        "propriete/",
+        ProprieteListCreateAPIView.as_view(),
+        name="propriete",
+    ),
+    path(
+        "propriete/<int:pk>/",
+        ProprieteRetrieveUpdateView.as_view(),
+        name="propriete_info",
+    ),
+    path(
+        "demandedortoire/",
+        DemandeReservationDortoireListCreateAPIView.as_view(),
+        name="demande_dortoire",
+    ),
+    path(
+        "demandedortoire/<int:pk>/",
+        DemandeReservationDortoireRetrieveUpdateView.as_view(),
+        name="demande_dortoire_info",
     ),
 ]

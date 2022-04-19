@@ -3,6 +3,7 @@ from django_extensions.db.fields import ShortUUIDField
 
 # from django.contrib.auth.models import User
 from django.conf import settings
+import datetime
 
 User = settings.AUTH_USER_MODEL
 
@@ -16,23 +17,23 @@ class CommonInfo(models.Model):
         abstract = True
 
 
-class TypeEtablissement(models.Model):
-    name = models.CharField(max_length=255, unique=True)
+class TypePropriete(models.Model):
+    name = models.CharField(max_length=200, unique=True)
 
     def __str__(self):
         return self.name
 
 
-class Etablissement(CommonInfo):
+class Propriete(CommonInfo):
     name = models.CharField(max_length=255, unique=True)
     tel = models.BigIntegerField(unique=True)
     fax = models.BigIntegerField(default=0)
     email = models.EmailField()
-    nbre_etages = models.IntegerField()
-    descripion = models.CharField(max_length=250)
+    nbre_etage = models.IntegerField()
+    descripion = models.CharField(max_length=500)
     adresse = models.CharField(max_length=500)
     matricule_fiscale = models.CharField(max_length=500)
-    type = models.ForeignKey(TypeEtablissement, on_delete=models.CASCADE)
+    type = models.ForeignKey(TypePropriete, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
@@ -45,46 +46,62 @@ class Universite(CommonInfo):
     email = models.EmailField()
     adresse = models.CharField(max_length=500)
     site_web = models.URLField(max_length=200, blank=True)
-    type = models.ForeignKey(TypeEtablissement, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return self.name
-
-
-class Universitetype(CommonInfo):
-    id_universiate = models.ForeignKey(
-        Universite,
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
+    type = models.ForeignKey(TypePropriete, on_delete=models.CASCADE)
+    latitude = models.DecimalField(
+        max_digits=9, decimal_places=6, null=True, blank=True
     )
-    type = models.CharField(max_length=255)
+    longitude = models.DecimalField(
+        max_digits=9, decimal_places=6, null=True, blank=True
+    )
 
     def __str__(self):
         return self.name
 
 
-class Chambre(CommonInfo):
-    id_etablissement = models.ForeignKey(
-        Etablissement,
+class Appartement(CommonInfo):
+    propriete = models.ForeignKey(
+        Propriete,
         on_delete=models.CASCADE,
         null=True,
         blank=True,
     )
     etage = models.IntegerField()
-    capacity = models.IntegerField()
-    description = models.CharField(max_length=250)
-    nbre_place_disponible = models.IntegerField()
+    nbre_lit = models.IntegerField()
+    nbre_chambre = models.IntegerField()
+    nbre_douche = models.IntegerField()
     nbre_places_reservees = models.IntegerField()
     espace_m2 = models.FloatField()
+    meuble = models.BooleanField(default=False, blank=True)
     prix = models.DecimalField(max_digits=10, decimal_places=2)
+    description = models.CharField(max_length=500)
+    photo = models.ImageField(upload_to="reservation/photos", null=True, blank=True)
+
+    def __str__(self):
+        return str(self.prix) + ": DT"
+
+
+class Chambre(CommonInfo):
+    appartement = models.ForeignKey(
+        Appartement,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
+    etage = models.IntegerField()
+    nbre_lit = models.IntegerField()
+    description = models.CharField(max_length=500)
+    nbre_places_reservees = models.IntegerField()
+    espace_m2 = models.FloatField()
+    meuble = models.BooleanField(default=False, blank=True)
+    prix = models.DecimalField(max_digits=10, decimal_places=2)
+    photo = models.ImageField(upload_to="reservation/photos", null=True, blank=True)
 
     def __str__(self):
         return str(self.prix) + ": DT"
 
 
 class Lit(CommonInfo):
-    id_chambre = models.ForeignKey(
+    chambre = models.ForeignKey(
         Chambre,
         on_delete=models.CASCADE,
         null=True,
@@ -106,8 +123,8 @@ class TypeProprietaire(models.Model):
 
 class Proprietaire(CommonInfo):
     id = ShortUUIDField(primary_key=True, editable=False)
-    id_etablissement = models.ForeignKey(
-        Etablissement,
+    propriete = models.ForeignKey(
+        Propriete,
         on_delete=models.CASCADE,
         null=True,
         blank=True,
@@ -130,8 +147,8 @@ class Proprietaire(CommonInfo):
 
 class Service(CommonInfo):
     id = ShortUUIDField(primary_key=True, editable=False)
-    id_etablissement = models.ForeignKey(
-        Etablissement,
+    propriete = models.ForeignKey(
+        Propriete,
         on_delete=models.CASCADE,
         null=True,
         blank=True,
@@ -144,31 +161,75 @@ class Service(CommonInfo):
         return self.titre
 
 
-class ReservationDortoire(CommonInfo):
+class ReservationDortoireDemande(CommonInfo):
     id = ShortUUIDField(primary_key=True, editable=False)
-    id_chambre = models.ForeignKey(
-        Chambre,
+    appartement = models.ForeignKey(
+        Appartement,
         on_delete=models.CASCADE,
         null=True,
         blank=True,
     )
-    period = models.DurationField()
-    id_client = models.ForeignKey(User, on_delete=models.CASCADE)
+    client = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    nom = models.CharField(max_length=500, blank=True)
+    prenom = models.CharField(max_length=500, blank=True)
+    gender = models.CharField(
+        max_length=140,
+        null=True,
+        choices=(("Male", "Masculin"), ("Female", "Feminin")),
+    )
+    date_naissance = models.DateField(null=True, blank=True)
+    ville = models.CharField(max_length=500, blank=True)
+    universite = models.ForeignKey(
+        Universite,
+        related_name="universite_reservation",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+    )
+    specialite = models.CharField(max_length=500, blank=True)
+    message = models.TextField(blank=True)
+
+    dete_debut = models.DateField(null=True, blank=True)
+    period = models.CharField(max_length=500, blank=True)
+    nbre_lit = models.IntegerField()
+    status = models.CharField(
+        max_length=140,
+        null=True,
+        choices=(
+            ("Waiting", "En attente"),
+            ("Closed", "Clôturée"),
+            ("Accepted", "Acceptée"),
+        ),
+    )
 
     def __str__(self):
         return self.period
 
 
+class ReservationDortoireConfirmee(CommonInfo):
+    id = ShortUUIDField(primary_key=True, editable=False)
+    demande_reservation = models.ForeignKey(
+        ReservationDortoireDemande,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
+
+    def __str__(self):
+        return self.demande_reservation
+
+
 class ReservationService(CommonInfo):
     id = ShortUUIDField(primary_key=True, editable=False)
-    id_service = models.ForeignKey(
+    service = models.ForeignKey(
         Chambre,
         on_delete=models.CASCADE,
         null=True,
         blank=True,
     )
-    period = models.DurationField()
-    id_client = models.ForeignKey(User, on_delete=models.CASCADE)
+    period = models.DurationField(default=datetime.timedelta())
+    client = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return self.period

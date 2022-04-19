@@ -1,23 +1,31 @@
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateAPIView
 
-from reservation.models import Chambre, Service, Universite
+from reservation.models import (
+    Appartement,
+    Service,
+    Universite,
+    ReservationDortoireDemande,
+    Propriete,
+)
 from reservation.serializers import (
-    ChambreSerializer,
+    AppartementSerializer,
     ServiceSerializer,
     UniversiteSerializer,
+    DemandeReservationDortoireSerializer,
+    ProprieteSerializer,
 )
 
 # retrieves a list of all rooms
 
 
-class ChambreListCreateAPIView(ListCreateAPIView):
-    queryset = Chambre.objects.all()
-    serializer_class = ChambreSerializer
+class AppartementListCreateAPIView(ListCreateAPIView):
+    queryset = Appartement.objects.all()
+    serializer_class = AppartementSerializer
 
 
-class ChambreRetrieveUpdateView(RetrieveUpdateAPIView):
-    queryset = Chambre.objects.all()
-    serializer_class = ChambreSerializer
+class AppartementRetrieveUpdateView(RetrieveUpdateAPIView):
+    queryset = Appartement.objects.all()
+    serializer_class = AppartementSerializer
 
 
 # retrieves a list of all services
@@ -44,3 +52,29 @@ class UniversiteListCreateAPIView(ListCreateAPIView):
 class UniversiteRetrieveUpdateView(RetrieveUpdateAPIView):
     queryset = Universite.objects.all()
     serializer_class = UniversiteSerializer
+
+
+# retrieves a list of all reservations demand
+
+
+class DemandeReservationDortoireListCreateAPIView(ListCreateAPIView):
+    queryset = ReservationDortoireDemande.objects.all()
+    serializer_class = DemandeReservationDortoireSerializer
+
+
+class DemandeReservationDortoireRetrieveUpdateView(RetrieveUpdateAPIView):
+    queryset = ReservationDortoireDemande.objects.all()
+    serializer_class = DemandeReservationDortoireSerializer
+
+
+# retrieves a list of all propriete
+
+
+class ProprieteListCreateAPIView(ListCreateAPIView):
+    queryset = Propriete.objects.all()
+    serializer_class = ProprieteSerializer
+
+
+class ProprieteRetrieveUpdateView(RetrieveUpdateAPIView):
+    queryset = Propriete.objects.all()
+    serializer_class = ProprieteSerializer
