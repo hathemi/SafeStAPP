@@ -7,7 +7,6 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.postgres.fields import ArrayField
 from django_base64field.fields import Base64Field
 
-
 # Create your models here.
 USER_ROLES = [("Admin", "Admin"), ("Staff", "Staff")]
 
@@ -67,7 +66,9 @@ class CustomUser(AbstractUser):
     introvertie = models.BooleanField(default=True, blank=True)
     alcoolique = models.BooleanField(default=False, blank=True)
     accepte_animal = models.BooleanField(default=False, blank=True)
-    photo = models.ImageField(upload_to="users/photos", null=True, blank=True)
+    photo = models.TextField()
+    photo_user = models.ImageField(upload_to="users/photos", null=True, blank=True)
+
     image_b64 = models.BinaryField(blank=True, null=True)
     # photo = Base64Field(max_length=900000, blank=True, null=True)
     autre_details = models.TextField(blank=True)
@@ -80,13 +81,3 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.password
-
-    @property
-    def image_url(self):
-        try:
-            img = open(self.photo.path, "rb")
-            data = img.read()
-            return "data:image/jpg;base64,%s" % data.encode("base64")
-
-        except IOError:
-            return self.photo.url

@@ -39,6 +39,38 @@ class Propriete(CommonInfo):
         return self.name
 
 
+CITY_CHOICES = (
+    ("tunis", "tunis"),
+    ("ariana", "ariana"),
+    ("benArous", "benArous"),
+    ("manouba", "manouba"),
+    ("nabeul", "nabeul"),
+    ("zaghouan", "zaghouan"),
+    ("bizerte", "bizerte"),
+    ("béja", "béja"),
+    ("jendouba", "jendouba"),
+    ("siliana", "siliana"),
+    ("sousse", "sousse"),
+    ("monastir", "monastir"),
+    ("mahdia", "mahdia"),
+    ("sfax", "sfax"),
+    ("kairouan", "kairouan"),
+    ("kasserine", "kasserine"),
+    ("sidiBouzid", "sidiBouzid"),
+    ("gabès", "gabès"),
+    ("mednine", "mednine"),
+    ("tataouine", "tataouine"),
+    ("gafsa", "gafsa"),
+    ("tozeur", "tozeur"),
+    ("kebili", "kebili"),
+)
+
+TYPE_CHOICES = (
+    ("public", "public"),
+    ("prive", "prive"),
+)
+
+
 class Universite(CommonInfo):
     name = models.CharField(max_length=255, unique=True)
     tel = models.BigIntegerField(unique=True)
@@ -46,7 +78,8 @@ class Universite(CommonInfo):
     email = models.EmailField()
     adresse = models.CharField(max_length=500)
     site_web = models.URLField(max_length=200, blank=True)
-    type = models.ForeignKey(TypePropriete, on_delete=models.CASCADE)
+    ville = models.CharField(max_length=50, choices=CITY_CHOICES, default="tunis")
+    type = models.CharField(max_length=50, choices=TYPE_CHOICES, default="public")
     latitude = models.DecimalField(
         max_digits=9, decimal_places=6, null=True, blank=True
     )
